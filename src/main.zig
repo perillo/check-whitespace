@@ -19,6 +19,7 @@ const process = std.process;
 
 var stderr = io.getStdErr().writer();
 var stdout = io.getStdOut().writer();
+var colorize = false;
 
 pub fn main() !void {
     var arena = heap.ArenaAllocator.init(heap.page_allocator);
@@ -29,6 +30,7 @@ pub fn main() !void {
     var args_it = try process.argsWithAllocator(allocator);
     _ = args_it.skip(); // it is safe to ignore
 
+    colorize = os.isatty(io.getStdErr().handle);
     while (args_it.next()) |path| {
         try checkWhitespace(path);
     }
@@ -78,5 +80,5 @@ fn checkWhitespace(path: []const u8) !void {
 
 /// Mark s as an error.
 fn eprintf(comptime s: []const u8) []const u8 {
-    return "\x1b[31m" ++ s ++ "\x1b[0m";
+    return if (colorize) "\x1b[31m" ++ s ++ "\x1b[0m" else s;
 }
