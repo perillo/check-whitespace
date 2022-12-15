@@ -40,6 +40,8 @@ fn checkWhitespace(path: []const u8) !void {
     var buf: [4096]u8 = undefined;
 
     var file = try fs.cwd().openFile(path, .{ .mode = .read_only });
+    defer file.close();
+
     var br = io.bufferedReader(file.reader());
     const r = br.reader();
     var lineno: usize = 0;
